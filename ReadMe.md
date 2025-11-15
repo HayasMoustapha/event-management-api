@@ -58,24 +58,24 @@ The system includes an **API Gateway** that routes client requests to the approp
 - `DELETE /event/:id` – Delete event  
 
 ### Tickets
-- `GET /ticket/event/:eventId` – List tickets for an event  
-- `POST /ticket/event/:eventId` – Create a new ticket for an event  
+- `GET /event/:eventId/ticket` – List tickets for an event  
+- `POST /event/:eventId/ticket` – Create a new ticket for an event  
 - `GET /tickets` - Get all tickets
 - `GET /ticket/:id` – Get ticket details  
 - `PUT /ticket/:id` – Update ticket  
 - `DELETE /ticket/:id` – Delete ticket  
 
 ### Orders
-- `POST /order/ticket/:ticketId` – Create a new order  
+- `POST /ticket/:ticketId/order` – Create a new order  
 - `GET /orders` – List all orders  
 - `GET /order/:id` – Get order details  
-- `GET /order/ticket/:ticketId` – Get orders of one ticket details  
+- `GET /ticket/:ticketId/order` – Get orders of one ticket details  
 - `PUT /order/:id` – Update order 
 - `DELETE /order/:id` – Update order 
 
 ### Payments (Stripe Integration)
 - `GET /payments` - Get all payments
-- `POST /payment/order/:orderId/create-intent` – Create a Stripe PaymentIntent (returns client_secret)  
+- `POST /order/:orderId/payment/create-intent` – Create a Stripe PaymentIntent (returns client_secret)  
 - `POST /payment/webhook` – Receive Stripe payment events (success, failure)
 - `POST /payment/cancel` - Cancel payment
 - `POST /payment/simulate-success` - Simulate payment
