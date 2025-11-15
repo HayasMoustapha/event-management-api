@@ -6,11 +6,11 @@ Port: 4003
 Manages tickets and stock.
 
 ## Endpoints
-- `GET /tickets/event/:eventId`
-- `GET /tickets/:id`
+- `GET /event/:eventId/tickets`
+- `GET /ticket/:id`
 - `GET /tickets`
-- `POST /tickets/event/:eventId`
-- `GET /tickets/:id/`
+- `POST /event/:eventId/ticket`
+- `GET /ticket/:id/`
 - `PUT /ticket/:id/`
 - `DELETE /ticket/:id/`
 
