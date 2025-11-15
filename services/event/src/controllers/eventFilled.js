@@ -5,7 +5,7 @@ const updateEventStatus = async () => {
     try {
         const events = await Event.find({ status : { $ne: 'filled' } });
         events.forEach(async (event) => {
-            const tickets = await axios.get(`${process.env.TICKET_SERVICE_URL}/ticket/event/${event._id}`).then((response) => {
+            const tickets = await axios.get(`${process.env.TICKET_SERVICE_URL}/event/${event._id}/ticket/`).then((response) => {
                 return response.data
             })
 

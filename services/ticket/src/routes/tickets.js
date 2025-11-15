@@ -36,7 +36,7 @@ router.get('/ticket/:id', async (req, res) => {
   }
 });
 
-router.get('/ticket/event/:eventId', async (req, res) => {
+router.get('/event/:eventId/tickets', async (req, res) => {
   try {
     const tickets = await Ticket.find({ eventId: req.params.eventId });
     if (!tickets) return res.status(404).json({ message: 'Tickets not found' });
@@ -47,7 +47,7 @@ router.get('/ticket/event/:eventId', async (req, res) => {
   }
 });
 
-router.post('/ticket/event/:eventId', auth, authorizeRoles("admin"), async (req, res, next) => {
+router.post('/event/:eventId/ticket', auth, authorizeRoles("admin"), async (req, res, next) => {
   try {
     const token = req.header('Authorization') && req.header('Authorization').split(' ')[1];
     if (req.user.role !== 'admin') return res.status(403).json({ message: 'Access denied' });

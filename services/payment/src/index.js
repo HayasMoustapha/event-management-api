@@ -11,7 +11,7 @@ dotenv.config()
 databaseConnection();
 
 // mount payment routes; webhook uses raw body
-app.use('/', require('./routes/payments'));
+app.use('/', require('./routes/payments')); 
 
 
 app.listen(process.env.PAYMENT_PORT, () => {

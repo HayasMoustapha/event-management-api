@@ -5,7 +5,7 @@ const updateTicketStatus = async () => {
     try {
         const tickets = await Ticket.find({ status : { $ne: 'unavailable' } });
         tickets.forEach(async (ticket) => {
-            const orders = await axios.get(`${process.env.ORDER_SERVICE_URL}/order/ticket/${ticket._id}`).then((response) => {
+            const orders = await axios.get(`${process.env.ORDER_SERVICE_URL}/ticket/${ticket._id}/order`).then((response) => {
                 return response.data
             })
 

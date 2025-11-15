@@ -33,7 +33,7 @@ router.get('/order/:id', async (req, res) => {
     }
 });
 
-router.get('/order/ticket/:ticketId', async (req, res) => {
+router.get('/ticket/:ticketId/orders', async (req, res) => {
     try {
         const orders = await Order.find({ ticketId: req.params.ticketId });
         if (!orders) return res.status(404).json({ message: 'orders not found' });
@@ -44,7 +44,7 @@ router.get('/order/ticket/:ticketId', async (req, res) => {
 });
 
 
-router.get('/order/event/:eventId', async (req, res) => {
+router.get('/event/:eventId/orders', async (req, res) => {
     try {
         const orders = await Order.find({ eventId: req.params.eventId });
         if (!orders) return res.status(404).json({ message: 'orders not found' });
@@ -54,7 +54,7 @@ router.get('/order/event/:eventId', async (req, res) => {
     }
 });
 
-router.post('/order/ticket/:ticketId', auth, authorizeRoles("client"), async (req, res) => {
+router.post('/ticket/:ticketId/order', auth, authorizeRoles("client"), async (req, res) => {
     try {
         if (req.user.role !== 'client') return res.status(403).json({ message: 'Access denied' });
         const token = req.header('Authorization') && req.header('Authorization').split(' ')[1];
