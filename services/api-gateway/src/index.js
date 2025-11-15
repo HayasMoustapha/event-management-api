@@ -47,7 +47,7 @@ const proxy = (service) => {
             res.status(500).send({ error: 'Internal server error' });
         }
     }
-}  
+}   
  
 // Route pour les services  
 app.use('/user-service', proxy('users')) 

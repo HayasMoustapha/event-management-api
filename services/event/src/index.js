@@ -7,7 +7,7 @@ require('./controllers/eventFilled')
 require('./controllers/eventTerminated')
 
 dotenv.config()    
-databaseConnection(); 
+databaseConnection();  
        
 const app = express(); 
 app.use(bodyParser.json())   

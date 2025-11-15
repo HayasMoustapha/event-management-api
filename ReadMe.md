@@ -86,7 +86,7 @@ The system includes an **API Gateway** that routes client requests to the approp
 ## How Services Communicate (Synchronous HTTP)
 
 All microservices communicate using **Axios** requests:
-- All services call the *User Service** for authentication
+- All services call the **User Service** for authentication
 - The **Payment Service** calls the **Order Service** directly via its HTTP endpoint to update order statuses.  
 - The **Order Service** calls the **Ticket Service** to verify ticket availability before confirming orders.  
 - Internal URLs are defined in environment variables (e.g., `ORDER_SERVICE_URL`, `TICKET_SERVICE_URL`).

@@ -13,7 +13,7 @@ const { auth, authorizeRoles } = require('../middlewares/auth');
 
 dotenv.config();
 
-router.get('/orders', async (req, res) => {
+router.get('/orders', async (req, res) => { 
     try {
         const orders = await Order.find();
         if (!orders) return res.status(404).json({ message: 'Orders not found' });
