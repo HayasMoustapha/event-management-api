@@ -7,7 +7,7 @@ Handles payments with Stripe PaymentIntents. On payment success/failure it updat
 
 ## Endpoints
 - `GET /payments` 
-- `POST /payment/order/:orderId/create-intent`
+- `POST /order/:orderId/payment/create-intent`
 - `POST /payment/webhook` (Stripe webhook)
 - `POST /payment/cancel`
 - `POST /payment/simulate-success` 
