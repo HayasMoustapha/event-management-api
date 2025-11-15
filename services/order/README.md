@@ -8,8 +8,8 @@ Creates orders after checking ticket availability synchronously via Axios. Updat
 ## Endpoints
 - `GET /orders` 
 - `GET /order/:id`
-- `GET /order/ticket/:ticketId`
-- `POST /order/ticket/:ticketId`
+- `GET /ticket/:ticketId/orders`
+- `POST /ticket/:ticketId/order`
 - `PUT /order/:id`
 - `DELETE /order/:id`
 
