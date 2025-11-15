@@ -14,11 +14,14 @@ Event
 - id (unique identifier): string
 - name: string
 - startDate: date
+- startTime: date
+- endTime: date
 - duration: number
 - endDate: date
 - location: string
 - description: string
-- type: string (free, paid)
+- type: string
+- category: string (free, paid)
 - capacity: number (Number of event's places)
 - status: string
 - tickets: list of Ticket objects
@@ -70,11 +73,14 @@ class Event {
   - id: string
   - name: string
   - startDate: date
+  - startTime: date
+  - endTime: date
   - duration: Number 
   - endDate: date
   - location: string
   - description: string
   - capacity: Number
+  - category: string
   - type: string
   - price: number
   - status: string
