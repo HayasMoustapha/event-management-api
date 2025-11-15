@@ -93,6 +93,10 @@ router.post('/ticket/:ticketId/order', auth, authorizeRoles("client"), async (re
             return res.status(403).json({ message: 'Ticket capacity exceeded' })
         }
 
+        if(req.body.quantity <= 0) {
+            return res.status(403).json({ message: 'Quantity must be greater than 0' })
+        }
+
         if (cumulativeCapacity === ticket.quantity) {
             await axios.put(`${process.env.TICKET_SERVICE_URL}/ticket/${req.params.ticketId}`, { status: 'unavailable' }, {
                 headers: {

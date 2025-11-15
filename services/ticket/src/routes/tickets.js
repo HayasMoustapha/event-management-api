@@ -89,6 +89,14 @@ router.post('/event/:eventId/ticket', auth, authorizeRoles("admin"), async (req,
       return res.status(403).json({ message: 'Event already ' + event.status })
     }
 
+    if(quantity <= 0) {
+      return res.status(403).json({ message: 'Quantity must be greater than 0' })
+    }
+
+    if(price < 0) {
+      return res.status(403).json({ message: 'Price must be greater than 0' })
+    }
+
     if (quantity > event.capacity) {
       return res.status(403).json({ message: 'Event capacity exceeded' })
     }

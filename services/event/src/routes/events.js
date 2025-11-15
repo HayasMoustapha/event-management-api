@@ -69,6 +69,10 @@ router.post('/event', auth, authorizeRoles('admin'), async (req, res) => {
       return res.status(403).json({ message: 'Start time must be in the future' });
     }
 
+    if(event.capacity <= 0) {
+      return res.status(403).json({ message: 'Capacity must be greater than 0' });
+    } 
+
     // If the event duration set, calculate the end date
     if (event.duration > 0) {
       const endTime = new Date(event.startDate);
