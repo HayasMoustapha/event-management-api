@@ -92,7 +92,7 @@ All microservices communicate using **Axios** requests:
 
 Example (Payment → Order):
 ```js
-await axios.put(`${process.env.ORDER_SERVICE_URL}/${payment.orderId}/status`, { status: 'paid' });
+await axios.put(`${process.env.ORDER_SERVICE_URL}/${payment.orderId}`, { status: 'paid' });
 ```
 
 ---
