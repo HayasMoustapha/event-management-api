@@ -58,7 +58,7 @@ The system includes an **API Gateway** that routes client requests to the approp
 - `DELETE /event/:id` – Delete event  
 
 ### Tickets
-- `GET /event/:eventId/ticket` – List tickets for an event  
+- `GET /event/:eventId/tickets` – List tickets for an event  
 - `POST /event/:eventId/ticket` – Create a new ticket for an event  
 - `GET /tickets` - Get all tickets
 - `GET /ticket/:id` – Get ticket details  
@@ -69,7 +69,7 @@ The system includes an **API Gateway** that routes client requests to the approp
 - `POST /ticket/:ticketId/order` – Create a new order  
 - `GET /orders` – List all orders  
 - `GET /order/:id` – Get order details  
-- `GET /ticket/:ticketId/order` – Get orders of one ticket details  
+- `GET /ticket/:ticketId/orders` – Get orders of one ticket details  
 - `PUT /order/:id` – Update order 
 - `DELETE /order/:id` – Update order 
 
