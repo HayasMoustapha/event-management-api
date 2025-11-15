@@ -13,6 +13,6 @@ const app = express();
  
 app.use(bodyParser.json());
 
-app.use('/', ticketRoutes);
+app.use('/', ticketRoutes); 
 
 app.listen(port, () => console.log(`Ticket service running on port ${port}`));
