@@ -81,6 +81,18 @@ The system includes an **API Gateway** that routes client requests to the approp
 - `POST /payment/simulate-success` - Simulate payment
 - `DELETE /payment/delete` - 
 
+
+### API GATEWAY 
+It follows the following syntax `localhost:[api-gateway-port]/[service-name]-service/` to be redirected to the service you want. This is the root URL to use to access a service for all methods (POST, GET, PUT, DELETE)
+- User service: `http://localhost:3000/user-service/.....`
+- Auth service: `http://localhost:3000/auth-service/....`
+- Event service: `http://localhost:3000/event-service/....`
+- Ticket service: `http://localhost:3000/ticket-service/...`
+- Order service: `http://localhost:3000/order-service/....`
+- Payment service: `http://localhost:3000/payment-service/...`
+
+
+
 ---
 
 ## How Services Communicate (Synchronous HTTP)
@@ -117,7 +129,7 @@ await axios.put(`${process.env.ORDER_SERVICE_URL}/${payment.orderId}`, { status:
 2. Install dependencies with `npm install`.  
 3. Configure environment variables (`.env`) for database connections, Stripe API keys, and microservice URLs.  
 4. Start each service with `npm start`.  
-
+5. We recommend you to use **POSTMAN** and import our postman collection `event-mangement-api.postman_collection.json` to test all services
 ---
 
 ## Notes
