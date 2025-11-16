@@ -6,7 +6,7 @@ const orderRoutes = require('./routes/orders');
 const databaseConnection = require('./utils/database');
 
 dotenv.config() 
-databaseConnection(); 
+databaseConnection();  
 
 const app = express(); 
 app.use(bodyParser.json())

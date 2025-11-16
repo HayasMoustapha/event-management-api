@@ -15,7 +15,7 @@ const EventSchema = new mongoose.Schema({
   description: { type: String },
   category: { type: String, enum: ['free', 'paid'], default: 'paid' },
   capacity: { type: Number, required: true },
-  status: { type: String, enum: ['active', 'terminated', 'cancelled'], default: 'active' },
+  status: { type: String, enum: ['active', 'terminated', 'cancelled', 'filled'], default: 'active' },
   tickets: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Ticket' }]
 }, { timestamps: true });
 

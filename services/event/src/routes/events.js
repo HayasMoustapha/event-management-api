@@ -9,6 +9,7 @@ const router = express.Router();
 const dotenv = require('dotenv');
 const Event = require('../models/Event');
 const moment = require('moment');
+
 const { auth, authorizeRoles } = require('../middlewares/auth');
 
 dotenv.config();
@@ -39,39 +40,41 @@ router.post('/event', auth, authorizeRoles('admin'), async (req, res) => {
     if (req.user.role !== 'admin') return res.status(403).json({ message: 'Access denied' });
     const event = req.body;
 
-    event.startDate = moment.utc(event.startDate, 'YYYY-MM-DD').toDate();
-    event.endDate = moment.utc(event.endDate, 'YYYY-MM-DD').toDate();
+    event.startDate = moment.utc(event.startDate).format('YYYY-MM-DD'); //moment.utc(event.startDate, 'YYYY-MM-DD');
+    event.endDate = moment.utc().format('YYYY-MM-DD');
     event.startTime = moment.utc(event.startTime, 'HH:mm').toDate();
     event.endTime = moment.utc(event.endTime, 'HH:mm').toDate();
-    const now = moment.utc().toDate();
-    const time = moment.utc().format('HH:mm');
+    const now = moment.utc(new Date()).format('YYYY-MM-DD');
+    const time = moment.utc(new Date(), 'HH:mm').add(1, 'hour').toDate();
 
-    if ((event.duration < 0 || !event.duration) && start > end) {
+    if ((event.duration < 0 || !event.duration) && event.startDate > event.endDate) {
       return res.status(403).json({ message: 'Start date must be before end date' });
     }
-    if ((event.duration < 0 || !event.duration) && end < start) {
+    if ((event.duration < 0 || !event.duration) && event.endDate < event.startDate) {
       return res.status(403).json({ message: 'End date must be after start date' });
     }
 
     if (event.endDate < event.startDate) {
       return res.status(403).json({ message: 'End date must be after start date' });
     }
+    console.log({ start: event.startDate, now , mydate: new Date()})
+    console.log({ start: event.startTime, end: event.endTime, time })
 
     if (event.startDate < now) {
       return res.status(403).json({ message: 'Start date must be in the future' });
     }
 
-    if(event.endTime < event.startTime) {
+    if (event.endTime < event.startTime) {
       return res.status(403).json({ message: 'End time must be after start time' });
     }
 
-    if(event.startTime < time) {
+    if (event.startTime < time) {
       return res.status(403).json({ message: 'Start time must be in the future' });
     }
 
-    if(event.capacity <= 0) {
+    if (event.capacity <= 0) {
       return res.status(403).json({ message: 'Capacity must be greater than 0' });
-    } 
+    }
 
     // If the event duration set, calculate the end date
     if (event.duration > 0) {
@@ -84,6 +87,7 @@ router.post('/event', auth, authorizeRoles('admin'), async (req, res) => {
     await ev.save();
     res.status(201).json(ev);
   } catch (err) {
+    console.log(err)
     res.status(500).json({ message: 'Event create error' });
   }
 });
@@ -91,6 +95,7 @@ router.post('/event', auth, authorizeRoles('admin'), async (req, res) => {
 
 router.put('/event/:id', auth, async (req, res) => {
   try {
+
     if (req.user.role !== 'admin') return res.status(403).json({ message: 'Access denied' });
 
     if (req.body.message === process.env.TICKET_CREATED_MESSAGE) {
@@ -103,8 +108,8 @@ router.put('/event/:id', auth, async (req, res) => {
       return res.json(eventUpdate);
     }
 
-      const eventUpdate = await Event.findByIdAndUpdate(req.params.id, req.body, { new: true });
-      res.json(eventUpdate);
+    const eventUpdate = await Event.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    res.json(eventUpdate);
 
   } catch (err) {
     res.status(500).json({ message: 'Event update error' });

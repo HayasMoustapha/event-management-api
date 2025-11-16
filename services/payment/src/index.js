@@ -9,7 +9,7 @@ app.use(bodyParser.json())
  
 dotenv.config()
 databaseConnection();
-
+ 
 // mount payment routes; webhook uses raw body
 app.use('/', require('./routes/payments')); 
 

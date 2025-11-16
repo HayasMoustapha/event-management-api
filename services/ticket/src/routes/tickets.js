@@ -82,9 +82,11 @@ router.post('/event/:eventId/ticket', auth, authorizeRoles("admin"), async (req,
     if (!event) {
       return res.status(404).json({ message: 'Event not found' });
     }
-    if (event.category === 'free') {
-      price = 0;
+
+    if (event.category === 'free' && price > 0) {
+      return res.status(403).json({ message: 'Event is free, price must be 0' });
     }
+
     if (event.status === 'cancelled' || event.status === 'terminated') {
       return res.status(403).json({ message: 'Event already ' + event.status })
     }
@@ -93,8 +95,12 @@ router.post('/event/:eventId/ticket', auth, authorizeRoles("admin"), async (req,
       return res.status(403).json({ message: 'Quantity must be greater than 0' })
     }
 
-    if(price < 0) {
-      return res.status(403).json({ message: 'Price must be greater than 0' })
+    if(price <= 0 && event.category === 'paid') {
+      return res.status(403).json({ message: 'Price must be greater than 0 because event is paid' })
+    } 
+
+    if(price > 0 && event.category === 'free') {
+      return res.status(403).json({ message: 'Price must be 0 because event is free' })
     }
 
     if (quantity > event.capacity) {
@@ -116,6 +122,7 @@ router.post('/event/:eventId/ticket', auth, authorizeRoles("admin"), async (req,
     })
     res.status(201).json(ticket)
   } catch (err) {
+    console.log(err)
     res.status(500).json({ message: 'Ticket creation failed' });
   }
 });
@@ -154,7 +161,7 @@ router.delete('/ticket/:id', auth, authorizeRoles("admin", "client"), async (req
     if (!ticket) return res.status(404).json({ message: 'Ticket not found' });
 
     await Ticket.findByIdAndDelete(req.params.id);
-    await axios.put(`${process.env.EVENT_SERVICE_URL}/event/${ticket.eventId.toString()}`, { message: process.env.TICKET_DELETED_MESSAGE, ticketId: req.params.id }, {
+    await axios.put(`${process.env.EVENT_SERVICE_URL}/event/${ticket.eventId}`, { message: process.env.TICKET_DELETED_MESSAGE, ticketId: req.params.id }, {
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'

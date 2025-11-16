@@ -46,7 +46,7 @@ const proxy = (service) => {
             console.error(error);
             res.status(500).send({ error: 'Internal server error' });
         }
-    }
+    } 
 }   
  
 // Route pour les services  

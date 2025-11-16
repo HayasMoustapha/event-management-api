@@ -9,8 +9,8 @@ const app = express();
     
 dotenv.config()   
 app.use(bodyParser.json())   
-        
-databaseConnection(); 
+         
+databaseConnection();  
   
 app.use('/', authRoutes);
 app.use('/', userRoutes); 

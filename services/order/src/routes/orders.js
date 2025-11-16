@@ -13,7 +13,7 @@ const { auth, authorizeRoles } = require('../middlewares/auth');
 
 dotenv.config();
 
-router.get('/orders', async (req, res) => { 
+router.get('/orders', async (req, res) => {
     try {
         const orders = await Order.find();
         if (!orders) return res.status(404).json({ message: 'Orders not found' });
@@ -74,6 +74,18 @@ router.post('/ticket/:ticketId/order', auth, authorizeRoles("client"), async (re
 
         const ticket = await response.data
 
+        const event = await axios.get(`${process.env.EVENT_SERVICE_URL}/event/${ticket.eventId}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        }).then((response) => {
+            return response.data
+        }).catch((error) => {
+            res.status(500).json({ message: 'Event not found' });
+        });
+
+
         if (ticket.status !== 'available') return res.status(403).json({ message: 'Ticket not available' })
 
         const result = await Order.aggregate([
@@ -93,7 +105,7 @@ router.post('/ticket/:ticketId/order', auth, authorizeRoles("client"), async (re
             return res.status(403).json({ message: 'Ticket capacity exceeded' })
         }
 
-        if(req.body.quantity <= 0) {
+        if (req.body.quantity <= 0) {
             return res.status(403).json({ message: 'Quantity must be greater than 0' })
         }
 
@@ -109,6 +121,10 @@ router.post('/ticket/:ticketId/order', auth, authorizeRoles("client"), async (re
                 console.log(error)
                 res.status(500).json({ message: "Update ticket's status request failed" });
             })
+        }
+
+        if (event.category === 'free') {
+            req.body.status = 'paid'
         }
 
         const order = new Order({ ...req.body, userId: req.user._id, ticketId: req.params.ticketId, eventId: ticket.eventId, total: ticket.price * req.body.quantity });
@@ -141,7 +157,7 @@ router.put('/order/:id', auth, authorizeRoles("admin", "client"), async (req, re
         if (!order) return res.status(404).json({ message: 'Order not found' });
 
         if (req.body.message === process.env.PAYMENT_PAID_MESSAGE) {
-            const orderUpdate = await Order.findByIdAndUpdate(req.params.id, {$set: { status: req.body.status } });
+            const orderUpdate = await Order.findByIdAndUpdate(req.params.id, { $set: { status: req.body.status } });
             return res.json(orderUpdate);
         }
 
