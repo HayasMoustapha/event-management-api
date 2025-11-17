@@ -4,6 +4,8 @@ const bodyParser = require('body-parser');
 const ticketRoutes = require('./routes/tickets');
 const databaseConnection = require('./utils/database');
 require('./controllers/ticketAvailability')
+const errorHandler = require('./middlewares/errorHandler');
+
 const port = process.env.TICKET_PORT || 3000;
    
 dotenv.config();   
@@ -12,7 +14,7 @@ databaseConnection();
 const app = express();  
  
 app.use(bodyParser.json());
- 
+app.use(errorHandler);
 app.use('/', ticketRoutes); 
 
 app.listen(port, () => console.log(`Ticket service running on port ${port}`));

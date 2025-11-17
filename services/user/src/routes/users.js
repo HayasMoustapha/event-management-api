@@ -36,7 +36,7 @@ router.put('/user/:id', auth, authorizeRoles("admin"), async (req, res) => {
     const user = await User.findByIdAndUpdate(req.params.id, updates, { new: true }).select('-password');
     res.json(user);
   } catch (err) {
-    res.status(500).json({ message: 'User update failed' });
+    res.status(500).json({ message: err.message });
   }
 });
 

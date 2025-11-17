@@ -112,7 +112,7 @@ router.put('/event/:id', auth, async (req, res) => {
     res.json(eventUpdate);
 
   } catch (err) {
-    res.status(500).json({ message: 'Event update error' });
+    res.status(500).json({ message: err.message });
   }
 });
 

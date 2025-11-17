@@ -165,7 +165,7 @@ router.post('/ticket/:ticketId/order', auth, authorizeRoles("client"), async (re
         res.status(201).json(order);
     } catch (err) {
         console.log(err)
-        res.status(500).json({ message: "Order create request failed" });
+        res.status(500).json({ message: err.message });
     }
 });
 
@@ -191,7 +191,7 @@ router.put('/order/:id', auth, authorizeRoles("admin", "client"), async (req, re
         res.json(orderUpdate)
 
     } catch (err) {
-        res.status(500).json({ message: 'Order update request failed' });
+        res.status(500).json({ message: err.message });
     }
 });
 

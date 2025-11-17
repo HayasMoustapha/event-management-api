@@ -5,6 +5,8 @@ const eventRoutes = require('./routes/events');
 const databaseConnection = require('./utils/database');
 require('./controllers/eventFilled')
 require('./controllers/eventTerminated')
+const errorHandler = require('./middlewares/errorHandler');
+
 
 dotenv.config()    
 databaseConnection();  
@@ -12,6 +14,7 @@ databaseConnection();
 const app = express(); 
 app.use(bodyParser.json())   
  
+app.use(errorHandler);
 app.use('/', eventRoutes); 
 
 

@@ -123,8 +123,7 @@ router.post('/event/:eventId/ticket', auth, authorizeRoles("admin"), async (req,
     })
     res.status(201).json(ticket)
   } catch (err) {
-    console.log(err)
-    res.status(500).json({ message: 'Ticket creation failed' });
+    res.status(500).json({ message: err.message });
   }
 });
 
@@ -149,7 +148,7 @@ router.put('/ticket/:id', auth, authorizeRoles("admin", "client"), async (req, r
     res.json(ticketUpdate);
 
   } catch (err) {
-    res.status(500).json({ message: 'Ticket update failed' });
+    res.status(500).json({ message: err.message });
   }
 });
 
@@ -174,7 +173,7 @@ router.put('/ticket/:id/order', async (req, res) => {
     res.json(ticketUpdate);
 
   } catch (err) {
-    res.status(500).json({ message: 'Ticket update failed' });
+    res.status(500).json({ message: err.message });
   }
 });
 

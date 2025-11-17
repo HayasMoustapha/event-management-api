@@ -55,7 +55,7 @@ router.post('/order/:orderId/payment/create-intent', auth, async (req, res) => {
     res.json({ paymentId: payment._id.toString(), clientSecret, stripeId: payment.stripePaymentIntentId });
   } catch (err) {
     console.error('create-intent error', err);
-    res.status(500).json({ message: 'Payment create request failed' });
+    res.status(500).json({ message: err.message });
   }
 });
 
@@ -112,7 +112,7 @@ router.post('/payment/simulate-success', auth, async (req, res) => {
     res.json({ message: 'Order marked as paid (simulated)' });
   } catch (err) {
     console.error('simulate-success error', err.message);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: err.message });
   }
 });
 
@@ -161,7 +161,7 @@ router.post('/payment/cancel', auth, async (req, res) => {
     res.json({ message: 'Payment cancelled', cancelled });
   } catch (err) {
     console.error('cancel error', err.message);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: err.message });
   }
 });
 
