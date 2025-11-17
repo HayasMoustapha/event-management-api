@@ -121,12 +121,29 @@ router.post('/payment/cancel', auth, async (req, res) => {
   try {
     const { paymentIntentId } = req.body;
     if (!paymentIntentId) return res.status(400).json({ message: 'paymentIntentId required' });
-    const cancelled = await cancelPayment(paymentIntentId);
 
     const Payment = require('../models/Payment');
-    const p = await Payment.findOne({ stripePaymentIntentId: paymentIntentId });
-    const orderId = p?.metadata?.orderId;
+
+    const payment = await Payment.findOne({ stripePaymentIntentId: paymentIntentId });
+    const orderId = payment?.metadata?.orderId;
     const token = req.header('Authorization') && req.header('Authorization').split(' ')[1];
+
+    const order = await axios.get(`${process.env.ORDER_SERVICE_URL}/order/${orderId}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    }).then((response) => {
+      console.log('Order found')
+      return response.data
+    }).catch((error) => {
+      console.log(error)
+      return res.status(403).json({ message: 'Order not found' })
+    });
+
+    if (order.status === 'paid') return res.status(403).json({ message: 'Order already paid' })
+
+    const cancelled = await cancelPayment(paymentIntentId);
 
     await axios.put(`${process.env.ORDER_SERVICE_URL}/order/${orderId}`, { 
       message: process.env.PAYMENT_CANCELLED_MESSAGE, 
@@ -155,14 +172,31 @@ router.delete('/payment/delete', auth, async (req, res) => {
     if (!paymentIntentId) return res.status(400).json({ message: 'paymentIntentId required' });
     const token = req.header('Authorization') && req.header('Authorization').split(' ')[1];
 
-    const cancelled = await cancelPayment(paymentIntentId);
-    // mark DB record as deleted if exists
     const Payment = require('../models/Payment');
-    const p = await Payment.findOne({ stripePaymentIntentId: paymentIntentId });
-    if (p) {
-      p.status = 'deleted';
-      await p.save();
-      const orderId = p?.metadata?.orderId;
+
+    const payment = await Payment.findOne({ stripePaymentIntentId: paymentIntentId });
+    const orderId = payment?.metadata?.orderId;
+
+    const order = await axios.get(`${process.env.ORDER_SERVICE_URL}/order/${orderId}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    }).then((response) => {
+      console.log('Order found')
+      return response.data
+    }).catch((error) => {
+      console.log(error)
+      return res.status(403).json({ message: 'Order not found' })
+    });
+
+    if (order.status === 'paid') return res.status(403).json({ message: 'Order already paid cannot be deleted' })
+    const cancelled = await cancelPayment(paymentIntentId);
+
+    if (payment) {
+      payment.status = 'deleted';
+      await payment.save();
+      const orderId = payment?.metadata?.orderId;
       await axios.put(`${process.env.ORDER_SERVICE_URL}/order/${orderId}`, { 
         message: process.env.PAYMENT_DELETED_MESSAGE, 
         status: 'deleted' 
