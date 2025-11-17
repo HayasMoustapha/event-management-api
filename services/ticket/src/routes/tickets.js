@@ -74,33 +74,34 @@ router.post('/event/:eventId/ticket', auth, authorizeRoles("admin"), async (req,
       }
     ])
 
-    const cumulativeCapacity = result[0]?.sum + quantity;
-    if (cumulativeCapacity > event.capacity) {
-      return res.status(403).json({ message: 'Event capacity exceeded' })
-    }
-
     if (!event) {
       return res.status(404).json({ message: 'Event not found' });
+    }
+
+    if (event.status === 'cancelled' || event.status === 'terminated' || event.status === 'filled') {
+      return res.status(403).json({ message: 'Event already ' + event.status })
     }
 
     if (event.category === 'free' && price > 0) {
       return res.status(403).json({ message: 'Event is free, price must be 0' });
     }
 
-    if (event.status === 'cancelled' || event.status === 'terminated') {
-      return res.status(403).json({ message: 'Event already ' + event.status })
-    }
-
-    if(quantity <= 0) {
-      return res.status(403).json({ message: 'Quantity must be greater than 0' })
-    }
-
-    if(price <= 0 && event.category === 'paid') {
+    if (price <= 0 && event.category === 'paid') {
       return res.status(403).json({ message: 'Price must be greater than 0 because event is paid' })
-    } 
+    }
 
-    if(price > 0 && event.category === 'free') {
+    if (price > 0 && event.category === 'free') {
       return res.status(403).json({ message: 'Price must be 0 because event is free' })
+    }
+
+    const cumulativeCapacity = result[0]?.sum + quantity;
+
+    if (cumulativeCapacity > event.capacity) {
+      return res.status(403).json({ message: 'Event capacity exceeded' })
+    }
+
+    if (quantity <= 0) {
+      return res.status(403).json({ message: 'Quantity must be greater than 0' })
     }
 
     if (quantity > event.capacity) {
@@ -117,7 +118,7 @@ router.post('/event/:eventId/ticket', auth, authorizeRoles("admin"), async (req,
     }).then((response) => {
       console.log('Ticket created send to event service')
     }).catch((error) => {
-      console.log(error) 
+      console.log(error)
       res.status(500).json({ message: "Update ticket's array in event colleciton request failed  (post route)" });
     })
     res.status(201).json(ticket)
@@ -130,6 +131,31 @@ router.post('/event/:eventId/ticket', auth, authorizeRoles("admin"), async (req,
 router.put('/ticket/:id', auth, authorizeRoles("admin", "client"), async (req, res) => {
   try {
     if (req.user.role !== 'admin' && req.user.role !== "client") return res.status(403).json({ message: 'Access denied' });
+
+    const ticket = await Ticket.findById(req.params.id);
+    if (!ticket) return res.status(404).json({ message: 'Ticket not found' });
+
+    if (req.body.message === process.env.ORDER_CREATED_MESSAGE) {
+      const ticketUpdate = await Ticket.findByIdAndUpdate(req.params.id, { $push: { orders: req.body.orderId } });
+      return res.json(ticketUpdate);
+    }
+
+    if (req.body.message === process.env.ORDER_DELETED_MESSAGE) {
+      const ticketUpdate = await Ticket.findByIdAndUpdate(req.params.id, { $pull: { orders: req.body.orderId }, $set: { status: 'available' } });
+      return res.json(ticketUpdate);
+    }
+
+    const ticketUpdate = await Ticket.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    res.json(ticketUpdate);
+
+  } catch (err) {
+    res.status(500).json({ message: 'Ticket update failed' });
+  }
+});
+
+// This is only for orderUpdate Event in Order Service
+router.put('/ticket/:id/order', async (req, res) => {
+  try {
 
     const ticket = await Ticket.findById(req.params.id);
     if (!ticket) return res.status(404).json({ message: 'Ticket not found' });

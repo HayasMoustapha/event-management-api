@@ -85,10 +85,17 @@ router.post('/ticket/:ticketId/order', auth, authorizeRoles("client"), async (re
             res.status(500).json({ message: 'Event not found' });
         });
 
+        if ((event.status === 'cancelled' || event.status === 'terminated')) {
+            return res.status(403).json({ message: 'Event already ' + event.status })
+        }
+
+        if (event.tickets.length === event.capacity) {
+            return res.status(403).json({ message: 'Event capacity exceeded' })
+        }
 
         if (ticket.status !== 'available') return res.status(403).json({ message: 'Ticket not available' })
 
-        const result = await Order.aggregate([
+        const results = await Order.aggregate([
             {
                 $group: {
                     _id: "$ticketId",
@@ -97,10 +104,24 @@ router.post('/ticket/:ticketId/order', auth, authorizeRoles("client"), async (re
             }
         ])
 
-        const cumulativeCapacity = result[0]?.sum + req.body?.quantity;
-        console.log(result[0]?.sum)
-        console.log({ cumulativeCapacity, qte: req.body?.quantity })
-        console.log(ticket.quantity)
+        if (!ticket) {
+            return res.status(404).json({ message: 'Ticket not found' });
+        }
+
+        let cumulativeCapacity = 0
+
+        results.forEach((result) => {
+            if (result._id.toString() === req.params.ticketId) {
+                cumulativeCapacity = result.sum + req.body?.quantity;
+            }
+        })
+
+        
+        // console.log(results)
+        // console.log(results[0]?.sum)
+        // console.log({ cumulativeCapacity, qte: req.body?.quantity })
+        // console.log(ticket.quantity)
+
         if (cumulativeCapacity > ticket.quantity) {
             return res.status(403).json({ message: 'Ticket capacity exceeded' })
         }
