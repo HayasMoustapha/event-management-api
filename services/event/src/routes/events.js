@@ -40,17 +40,17 @@ router.post('/event', auth, authorizeRoles('admin'), async (req, res) => {
     if (req.user.role !== 'admin') return res.status(403).json({ message: 'Access denied' });
     const event = req.body;
 
-    event.startDate = moment.utc(event.startDate).format('YYYY-MM-DD'); //moment.utc(event.startDate, 'YYYY-MM-DD');
-    event.endDate = moment.utc().format('YYYY-MM-DD');
+    event.startDate = event.startDate ? moment.utc(event.startDate).format('YYYY-MM-DD'): undefined; //moment.utc(event.startDate, 'YYYY-MM-DD');
+    event.endDate = event.endDate ? moment.utc().format('YYYY-MM-DD'): undefined;
     event.startTime = moment.utc(event.startTime, 'HH:mm').toDate();
     event.endTime = moment.utc(event.endTime, 'HH:mm').toDate();
     const now = moment.utc(new Date()).format('YYYY-MM-DD');
     const time = moment.utc(new Date(), 'HH:mm').add(1, 'hour').toDate();
 
-    if ((event.duration < 0 || !event.duration) && event.startDate > event.endDate) {
+    if ((event.endDate && event.startDate) && event.startDate > event.endDate) {
       return res.status(403).json({ message: 'Start date must be before end date' });
     }
-    if ((event.duration < 0 || !event.duration) && event.endDate < event.startDate) {
+    if ((event.endDate && event.startDate) && event.endDate < event.startDate) {
       return res.status(403).json({ message: 'End date must be after start date' });
     }
 
@@ -88,7 +88,7 @@ router.post('/event', auth, authorizeRoles('admin'), async (req, res) => {
     res.status(201).json(ev);
   } catch (err) {
     console.log(err)
-    res.status(500).json({ message: 'Event create error' });
+    res.status(500).json({ message: err.message });
   }
 });
 
