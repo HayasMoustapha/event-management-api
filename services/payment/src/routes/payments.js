@@ -33,20 +33,22 @@ router.post('/order/:orderId/payment/create-intent', auth, async (req, res) => {
     const orderId = req.params.orderId;
     const token = req.header('Authorization') && req.header('Authorization').split(' ')[1];
 
-    const response = await axios.get(`${process.env.ORDER_SERVICE_URL}/order/${orderId}`, {
+    const order = await axios.get(`${process.env.ORDER_SERVICE_URL}/order/${orderId}`, {
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
       }
     }).then((response) => {
       console.log('Order found')
-      return response
+      return response.data
     }).catch((error) => {
       console.log(error)
       return res.status(403).json({ message: 'Order not found' })
     });
 
-    const amount = await response?.data?.total
+    if(order.status === 'paid') return res.status(403).json({ message: 'Order already paid' })
+
+    const amount = order?.total
     if (!orderId || !amount) return res.status(400).json({ message: 'orderId and amount required' });
     const { payment, clientSecret } = await createPaymentIntent(orderId, parseFloat(amount), currency || 'usd');
 
@@ -77,6 +79,21 @@ router.post('/payment/simulate-success', auth, async (req, res) => {
     const { orderId } = req.body;
     if (!orderId) return res.status(400).json({ message: 'orderId required' });
     const token = req.header('Authorization') && req.header('Authorization').split(' ')[1];
+
+    const order = await axios.get(`${process.env.ORDER_SERVICE_URL}/order/${orderId}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    }).then((response) => {
+      console.log('Order found')
+      return response.data
+    }).catch((error) => {
+      console.log(error)
+      return res.status(403).json({ message: 'Order not found' })
+    });
+
+    if (order.status === 'paid') return res.status(403).json({ message: 'Order already paid' })
 
     await axios.put(`${process.env.ORDER_SERVICE_URL}/order/${orderId}`, { 
       message: process.env.PAYMENT_PAID_MESSAGE, 
